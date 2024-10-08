@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QListWidget, QLineEdit, QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QListWidget, QLineEdit
+from project_details_window import ProjectDetailsWindow  # Import the class
 
 class ProjectsPage(QWidget):
     def __init__(self, main_window):
@@ -11,6 +12,7 @@ class ProjectsPage(QWidget):
 
         # Create a list widget to display current projects
         self.projects_list = QListWidget()
+        self.projects_list.itemDoubleClicked.connect(self.open_project_details)  # Double-click signal
         self.layout.addWidget(self.projects_list)
 
         # Form to add new projects
@@ -26,15 +28,6 @@ class ProjectsPage(QWidget):
         add_project_button = QPushButton("Add Project")
         add_project_button.clicked.connect(self.add_project)
         self.layout.addWidget(add_project_button)
-
-        # Edit and delete buttons (we'll implement functionality for these)
-        self.edit_button = QPushButton("Edit Project")
-        self.edit_button.clicked.connect(self.edit_project)
-        self.layout.addWidget(self.edit_button)
-
-        self.delete_button = QPushButton("Delete Project")
-        self.delete_button.clicked.connect(self.delete_project)
-        self.layout.addWidget(self.delete_button)
 
         # Back button to return to the dashboard
         back_button = QPushButton("Back to Dashboard")
@@ -57,24 +50,7 @@ class ProjectsPage(QWidget):
         else:
             QMessageBox.warning(self, "Input Error", "Please enter a project name.")
 
-    def edit_project(self):
-        # Get the selected project
-        selected_project = self.projects_list.currentItem()
-        if selected_project:
-            # Split the project name and description
-            project_details = selected_project.text().split(": ")
-            self.project_name_input.setText(project_details[0])
-            if len(project_details) > 1:
-                self.project_description_input.setText(project_details[1])
-            # Remove the selected project to be replaced by the edited one
-            self.projects_list.takeItem(self.projects_list.row(selected_project))
-        else:
-            QMessageBox.warning(self, "Selection Error", "Please select a project to edit.")
-
-    def delete_project(self):
-        # Delete the selected project
-        selected_project = self.projects_list.currentItem()
-        if selected_project:
-            self.projects_list.takeItem(self.projects_list.row(selected_project))
-        else:
-            QMessageBox.warning(self, "Selection Error", "Please select a project to delete.")
+    def open_project_details(self, item):
+        # Create and open the project details window when a project is double-clicked
+        details_window = ProjectDetailsWindow(item.text(), self)
+        details_window.exec_()
